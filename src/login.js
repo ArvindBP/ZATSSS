@@ -25,27 +25,12 @@ export default class Login extends React.Component{
       <h1 className="App-title">Welcome to ZATSSS</h1>
     </MediaQuery>
         </header>
-		<div className="loginfields centered" >
-			<TextField
-          		id="with-placeholder"
-          		label="Username"
-          		placeholder="Username"
-          		margin="normal"
-        	/>
-        	<br />
-        	<TextField
-          		id="password-input"
-          		label="Password"
-          		type="password"
-          		autoComplete="current-password"
-          		margin="normal"
-        	/>
-        	<br />
-        	<Button variant="raised" color="primary" component={Link} to="/Router" >
-            Login
-          </Button>
-        </div>
-        </fragment>
+		  <div className="loginfields centered" >
+    	 <Button variant="raised" color="primary" component={Link} to="/Router" >
+          Login with Google
+        </Button>
+      </div>
+    </fragment>
 		);
 	}
 }
