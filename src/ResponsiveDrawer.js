@@ -22,6 +22,13 @@ import FullScreenDialog from './fullscreendialog';
 import CreateChannel from './CreateChannel';
 import Icon from 'material-ui/Icon';
 import green from 'material-ui/colors/green';
+import {
+  HashRouter as Router,
+  Route,
+  Link,
+  Switch,
+  Redirect
+} from 'react-router-dom'
 
 const drawerWidth = 240;
 
@@ -189,7 +196,6 @@ class ResponsiveDrawer extends React.Component {
    }
   render() {
 
-    
     let hello = this.state.users.map((user) =>{
       return (
         <ListItem button>
@@ -206,14 +212,14 @@ class ResponsiveDrawer extends React.Component {
         <Grid container>
           <Grid xs={12}>
             <ListItem>
-              <ListItemText primary="Sapient-XT" />
+              <ListItemText primary={firebase.auth().currentUser.displayName} />
             </ListItem>
           </Grid>   
         </Grid>
         <Divider />
         </List>
-        <div className={classes.toolbar} />
-        <ListItem>
+        
+        <ListItem button>
           <h3>Channels</h3>
           <Icon button className={classes.iconHover} onClick={this.handleClick}>
            add_circle
