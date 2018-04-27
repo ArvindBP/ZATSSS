@@ -49,15 +49,6 @@ class FullScreenDialog extends React.Component {
   state = {
     open: false,
     inputIs:'',
-    people:[
-      {id:0 , person:'raja'},
-      {id:1 , person:'rahul'},
-      {id:2 , person:'zunaid'},
-      {id:3 , person:'tushar'},
-      {id:4 , person:'akash'},
-      {id:5 , person:'arvind'},
-    ],
-    Nid:6,
   };
 
   handleClickOpen = () => {
@@ -71,16 +62,22 @@ class FullScreenDialog extends React.Component {
     this.setState({inputIs:input_text});
     // console.log("text input "+this.state.inputIs);
   }
+
+  submit = (name) => {
+    
+    this.handleClose();
+    this.props.choosingdm(name);
+  }
   
   render() {
     const { classes } = this.props;
     const call = <div>
                   {
-                    this.state.people.map((items)=>{
-                      if(items.person===this.state.inputIs){
+                    this.props.users.map((items)=>{
+                      if(items.name===this.state.inputIs){
                         return(
                            <ListItem key={items.id} dense button className={classes.listItem} style={{background: 'beige',marginBottom: '6px'}}>
-                            <ListItemText primary={items.person} style={{color: '#ffffff', fontSize: '18px', marginLeft: '10px'}}/>
+                            <ListItemText onClick={()=>this.submit(items.name)} primary={items.name} style={{color: '#ffffff', fontSize: '18px', marginLeft: '10px'}}/>
                           </ListItem> 
                         );
                       }

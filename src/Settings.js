@@ -129,7 +129,7 @@ class Settings extends React.Component {
             onClose={this.handleClose}
             aria-labelledby="form-dialog-title"
           >
-            <DialogTitle id="form-dialog-title">Invite others to #General</DialogTitle>
+            <DialogTitle id="form-dialog-title">Invite others to {this.props.clicked}</DialogTitle>
             <DialogContent>
               <TextField
                 autoFocus

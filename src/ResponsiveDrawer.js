@@ -37,18 +37,19 @@ const styles = theme => ({
     display: 'flex',
     width: '100%',
   },
+
   iconHover: {
     margin: theme.spacing.unit * 2,
     '&:hover': {
       color: green[200],
     },
+
   },
 
   adornmentamount: {
    width:'80%',
    marginTop:'53%',
    paddingleft:'10px;',
-   
    position:'relative',
    
 },
@@ -93,28 +94,29 @@ class ResponsiveDrawer extends React.Component {
 
   constructor(props){
     super(props);
-  this.state = {
-    mobileOpen: false,
-    auth: true,
-    anchorEl: null,
-    open: false,
-    direction: 'row',
-   justify: 'space-between',
-   alignItems: 'flex-start',
-   members:[],
-   users:[],
-   channels: [],
-   searchTerm:'',
-   nextId:0,
-   openCreateChannel:false,
-    list:[]
-
-  };
-}
+    this.state = {
+      mobileOpen: false,
+      auth: true,
+      anchorEl: null,
+      open: false,
+      direction: 'row',
+      justify: 'space-between',
+      alignItems: 'flex-start',
+      members:[],
+      users:[],
+      channels: [],
+      searchTerm:'',
+      clicked:'',
+      nextId:0,
+      openCreateChannel:false,
+      list:[]
+    };
+  }
 
   handleClick = () => {
     this.setState({openCreateChannel:true})
-  } 
+  }
+
   createChannels = (newChannel) => {
     // console.log(newChannel);
     // let x = this.state.list;
@@ -192,8 +194,11 @@ class ResponsiveDrawer extends React.Component {
            let obj;
            console.log(channelArr);
            for(obj in channelArr){
-             console.log(channelArr[obj].channelname);
-             channel.push(channelArr[obj].channelname);
+              let obj1 = {};
+              obj1.id = obj;
+              obj1.name = channelArr[obj].channelname;
+              obj1.members = [];
+             channel.push(obj1);
            }
            this.setState({channels: channel});
            console.log("console from component mount: ",channel);
@@ -230,6 +235,8 @@ class ResponsiveDrawer extends React.Component {
     this.setState({ open: false });
   };
   addUsers = () => {
+
+
      let adding = this.state.members.slice();
      adding.push({id:this.state.nextId , person:this.state.searchTerm});
      this.setState({
@@ -237,17 +244,65 @@ class ResponsiveDrawer extends React.Component {
        nextId : ++this.state.nextId
      });
    };
+
+
   handleEvent = (term) => {
-     this.state.searchTerm = term;
-     this.setState({searchTerm: term});
-     console.log("inside  "+this.state.searchTerm);
-     this.addUsers();
+    let flag =0;
+    for(let k=0;k<this.state.users.length;k++){
+      if(term == this.state.users[k].name && flag==0){
+        flag = 1 ;
+      }
+    }
+
+    if(flag ==1){
+      for(let j=0;j<this.state.channels.length;j++){
+        if(this.state.clicked == this.state.channels[j].name){
+          this.state.channels[j].members.push(term)
+        }
+      }
+    }
+
+    this.setState({
+      channels : this.state.channels,
+    })
+     // this.state.searchTerm = term;
+     // this.setState({searchTerm: term});
+     // console.log("inside  "+this.state.searchTerm);
+     // this.addUsers();
    }
 
    hello = (id) => {
-    console.log(id)
+    for(let i =0; i< this.state.users.length; i++){
+        if(this.state.users[i].id == id){
+          this.state.clicked = this.state.users[i].name
+        }
+     }
+
+     this.setState({
+        clicked : this.state.clicked
+     })
    }
-  render() {
+   hello1 = (id) => {
+     for(let i =0; i< this.state.channels.length; i++){
+        if(this.state.channels[i].id == id){
+          this.state.clicked = this.state.channels[i].name
+        }
+     }
+
+     this.setState({
+        clicked :this.state.clicked
+     })
+   
+   }
+
+   choosingdm = (name) => {
+      this.state.clicked = name;
+      this.setState({
+        clicked : this.state.clicked
+      })
+   }
+  
+    render() {
 
     
     let hello = this.state.users.map((user) =>{
@@ -261,7 +316,7 @@ class ResponsiveDrawer extends React.Component {
     let Channel = this.state.channels.map( (item) => {
           return (
                 <ListItem button>
-                    <ListItemText primary={item}
+                    <ListItemText onClick={()=>this.hello1(item.id)} primary={item.name}
                       style={{float:"left", color: '#ffffff', fontSize: '18px', marginLeft: '10px' }} />
                       
                 </ListItem> )
@@ -284,7 +339,7 @@ class ResponsiveDrawer extends React.Component {
         </List>
         <div className={classes.toolbar} />
         <ListItem button>
-         <FullScreenDialog />
+         <FullScreenDialog choosingdm={this.choosingdm} users={this.state.users} />
        </ListItem>
         <ListItem>
           <h3>Channels</h3>
@@ -293,7 +348,7 @@ class ResponsiveDrawer extends React.Component {
           </Icon>
         </ListItem>
           { Channel }
-          <h3 >&nbsp;&nbsp;Users </h3>
+          <h3>Users </h3>
           {hello} 
       </div>
     );
@@ -318,14 +373,14 @@ class ResponsiveDrawer extends React.Component {
             >
              <Grid xs={10}>
                <Typography variant="title" color="inherit" noWrap>
-                  
+                  {this.state.clicked}
                </Typography>
              </Grid>
              <Grid xs={1}>
-               <TemporaryDrawer members={this.state.members}/>
+               <TemporaryDrawer clicked={this.state.clicked} members={this.state.channels}/>
              </Grid>
              <Grid xs={1}>
-                <Settings signOut={this.signOut} meth={this.handleEvent}/>
+                <Settings clicked={this.state.clicked} signOut={this.signOut} meth={this.handleEvent}/>
              </Grid>
             </Grid>
           </Toolbar>
@@ -364,11 +419,9 @@ class ResponsiveDrawer extends React.Component {
          <Input
            className = {classes.adornmentamount}
            placeholder="enter the message"
-           startAdornment={<InputAdornment position="start"></InputAdornment>
-}
-
-         />
-             <i class="material-icons">send</i>
+           startAdornment={<InputAdornment position="start"></InputAdornment>}
+        />
+             <button>Send</button>
           {this.state.openCreateChannel && <CreateChannel channels={this.createChannels} />}
         </main>
       </div>

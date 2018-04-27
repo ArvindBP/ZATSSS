@@ -31,9 +31,9 @@ class TemporaryDrawer extends React.Component {
 
     const sideList = (
       <div className={classes.list}>
-        <List>About #General</List>
+        <List>About #{this.props.clicked}</List>
         <Divider />
-        <List><SideBar text={this.props.members}/></List>
+        <List><SideBar clicked={this.props.clicked} text={this.props.members}/></List>
         <Divider />
       </div>
     );

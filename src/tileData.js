@@ -83,6 +83,8 @@ class SideBar extends React.Component{
     const { classes } = this.props;
     const { expanded } = this.state;
     const tod = this.props.text.map((test)=>{
+            if(test.name == this.props.clicked)
+            {
                     return(
                         <ListItem
                           key={test.person}
@@ -91,9 +93,10 @@ class SideBar extends React.Component{
                           button
                           className={classes.listItem}
                         >
-                          <ListItemText primary={test.person} />
+                          <ListItemText primary={test.members[0]} />
                         </ListItem>
                     );
+              }
                   });
     return(
         <div>
