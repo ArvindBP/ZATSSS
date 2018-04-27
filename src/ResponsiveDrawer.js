@@ -122,17 +122,7 @@ class ResponsiveDrawer extends React.Component {
 
 
   componentDidMount(){
-    //var userId = firebase.auth().currentUser.uid;
-  // const  firebase.database().ref('/users/').once('value').then(function(snapshot) {
-  // var username = snapshot.val() || 'Anonymous';
-  // let obj;
-  // let user = [];
-
-  // for (obj in username){
-  //   user.push(username[obj].username);
-  // }
-  // this.state.users = user;
-  // this.setState({users: user});
+    
   let user = [];        
   const UserList = firebase.database().ref('users/').once('value').then(function(snapshot) {
            console.log("Users: ", snapshot.val());
@@ -144,6 +134,7 @@ class ResponsiveDrawer extends React.Component {
              user.push(userArr[obj].username);
            }
        });
+
 //this.setState({users: user});
 //console.log("console from component mount: ",this.state.users);
 
@@ -227,15 +218,29 @@ class ResponsiveDrawer extends React.Component {
         </ListItem>
         {
             this.state.list.map(item => (
-              <List>
                 <ListItem key={item.id} dense button className={classes.listItem} style={{ background: 'beige', marginBottom: '6px' }}>
                     <ListItemText primary={item.val}
                       style={{float:"left", color: '#ffffff', fontSize: '18px', marginLeft: '10px' }} />
                       
                 </ListItem>
-              </List>
             ))
-          } 
+          }
+        <ListItem button>
+          <h3>Direct Messages</h3>
+          <Icon button className={classes.iconHover} onClick={this.handleClick}>
+           add_circle
+          </Icon>
+        </ListItem>
+        {
+            this.state.list.map(item => (
+                <ListItem key={item.id} dense button className={classes.listItem} style={{ background: 'beige', marginBottom: '6px' }}>
+                    <ListItemText primary={item.val}
+                      style={{float:"left", color: '#ffffff', fontSize: '18px', marginLeft: '10px' }} />
+                      
+                </ListItem>
+            ))
+          }
+
       </div>
     );
 
