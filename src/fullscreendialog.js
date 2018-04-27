@@ -61,9 +61,7 @@ class FullScreenDialog extends React.Component {
               </Typography>
             </Toolbar>
           </AppBar>
-          <List>
           
-          </List>
         </Dialog>
       </div>
     );

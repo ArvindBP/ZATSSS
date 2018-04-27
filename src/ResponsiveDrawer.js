@@ -4,30 +4,26 @@ import { withStyles } from 'material-ui/styles';
 import Drawer from 'material-ui/Drawer';
 import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
-import List from 'material-ui/List';
 import Typography from 'material-ui/Typography';
 import IconButton from 'material-ui/IconButton';
 import Hidden from 'material-ui/Hidden';
 import Divider from 'material-ui/Divider';
 import MenuIcon from '@material-ui/icons/Menu';
-import Menu, { MenuItem } from 'material-ui/Menu';
-import Button from 'material-ui/Button';
-import TextField from 'material-ui/TextField'
-import Dialog, {
-  DialogActions,
-  DialogContent,
-  //DialogContentText,
-  DialogTitle,
-} from 'material-ui/Dialog';
-import { mailFolderListItems,SideBar } from './tileData';
+import { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
+import InboxIcon from '@material-ui/icons/MoveToInbox';
+import StarIcon from '@material-ui/icons/Star';
 import TemporaryDrawer from './SideBar';
-
+import Settings from './Settings';
+import Grid from 'material-ui/Grid';
+import * as firebase from 'firebase';
+import history from './history';
+import FullScreenDialog from './fullscreendialog';
 const drawerWidth = 240;
 
 const styles = theme => ({
   root: {
     flexGrow: 1,
-    height: 430,
+    height: '100%',
     zIndex: 1,
     overflow: 'hidden',
     position: 'relative',
@@ -62,42 +58,131 @@ const styles = theme => ({
     marginLeft: -12,
     marginRight: 20,
   },
+  upper:{
+    display:'flex',
+  },
+  navi:{
+    display:'flex',
+  }
 });
 
 class ResponsiveDrawer extends React.Component {
-  state = {
+
+  constructor(props){
+    super(props);
+  this.state = {
     mobileOpen: false,
     auth: true,
     anchorEl: null,
     open: false,
+    direction: 'row',
+   justify: 'space-between',
+   alignItems: 'flex-start',
+   users:[],
+   searchTerm:'',
+   nextId:0,
   };
+}
+
+  componentDidMount(){
+    //var userId = firebase.auth().currentUser.uid;
+  // const  firebase.database().ref('/users/').once('value').then(function(snapshot) {
+  // var username = snapshot.val() || 'Anonymous';
+  // let obj;
+  // let user = [];
+
+  // for (obj in username){
+  //   user.push(username[obj].username);
+  // }
+  // this.state.users = user;
+  // this.setState({users: user});
+  let user = [];        
+  const UserList = firebase.database().ref('users/').once('value').then(function(snapshot) {
+           console.log("Users: ", snapshot.val());
+           let userArr = snapshot.val();
+           let obj;
+           console.log(userArr);
+           for(obj in userArr){
+             console.log(userArr[obj].username);
+             user.push(userArr[obj].username);
+           }
+       });
+//this.setState({users: user});
+//console.log("console from component mount: ",this.state.users);
+
+  
+
+  }
+
+
+  signOut = () => {
+        firebase.auth().signOut().then(function() {
+            // Sign-out successful.
+            console.log("user is signed out");
+            history.push('./');
+
+        }).catch(function(error) {
+            // An error happened.
+            console.log(error);
+        });
+    }
 
   handleDrawerToggle = () => {
     this.setState({ mobileOpen: !this.state.mobileOpen });
   };
+
   handleMenu = event => {
     this.setState({ anchorEl: event.currentTarget });
   };
+
   handleClickOpen = () => {
     this.setState({ open: true });
   };
+
   handleClose = () => {
     this.setState({ anchorEl: null });
     this.setState({ open: false });
   };
+  addUsers = () => {
+     let adding = this.state.users.slice();
+     adding.push({id:this.state.nextId , person:this.state.searchTerm});
+     this.setState({
+       users : adding,
+       nextId : ++this.state.nextId
+     });
+   };
+  handleEvent = (term) => {
+     this.state.searchTerm = term;
+     this.setState({searchTerm: term});
+     console.log("inside  "+this.state.searchTerm);
+     this.addUsers();
+   }
   render() {
-    const { classes, theme } = this.props;
-    const { anchorEl } = this.state;
-    const open = Boolean(anchorEl);
 
+    
+    let hello = this.state.users.map((user) =>{
+      return (
+        <ListItem button>
+          <ListItemText primary={user} />
+        </ListItem>
+   )
+    })
+    console.log(hello);
+    const { alignItems, direction, justify } = this.state;
+    const { classes, theme } = this.props;
     const drawer = (
-      <div>
-        <div className={classes.toolbar} />
+      <div className={classes.toolbar} >
+        
+        <ListItem button>
+          <ListItemText primary="Channel" />
+        </ListItem>
         <Divider />
-        <List>{mailFolderListItems}</List>
-        <Divider />
+        <ListItem button >
+          <FullScreenDialog />
+        </ListItem>
+                
       </div>
-    );
+   );
 
     return (
       <div className={classes.root}>
@@ -112,65 +197,23 @@ class ResponsiveDrawer extends React.Component {
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="title" color="inherit" noWrap>
-              #General
-            </Typography>
-            <div>
-              <TemporaryDrawer/>
-              <Button>
-                <i class="material-icons"
-                  aria-owns={open ? 'menu-appbar' : null}
-                  aria-haspopup="true"
-                  onClick={this.handleMenu}
-                  color="inherit"
-                >settings</i>
-              </Button>
-              <Menu
-                  id="menu-appbar"
-                  anchorEl={anchorEl}
-                  anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                  }}
-                  transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                  }}
-                  open={open}
-                  onClose={this.handleClose}
-              >
-                  <MenuItem onClick={this.handleClose}>Profile</MenuItem>
-                  <MenuItem onClick={this.handleClose}>My account</MenuItem>
-                  <MenuItem onClick={this.handleClickOpen}>Invite new member</MenuItem>
-              </Menu>
-              <div>
-                <Dialog
-                  open={this.state.open}
-                  onClose={this.handleClose}
-                  aria-labelledby="form-dialog-title"
-                >
-                  <DialogTitle id="form-dialog-title">Invite others to #General</DialogTitle>
-                  <DialogContent>
-                    <TextField
-                      autoFocus
-                      margin="dense"
-                      id="name"
-                      label="Enter Name"
-                      type="name"
-                      fullWidth
-                    />
-                  </DialogContent>
-                  <DialogActions>
-                    <Button onClick={this.handleClose} color="primary">
-                      Cancel
-                    </Button>
-                    <Button onClick={this.handleClose} color="primary">
-                      Invite
-                    </Button>
-                  </DialogActions>
-                </Dialog>
-              </div>
-            </div>
+            <Grid container
+             alignItems={alignItems}
+             direction={direction}
+             justify={justify}
+            >
+             <Grid xs={10}>
+               <Typography variant="title" color="inherit" noWrap>
+                  
+               </Typography>
+             </Grid>
+             <Grid xs={1}>
+               <TemporaryDrawer users={this.state.users}/>
+             </Grid>
+             <Grid xs={1}>
+                <Settings signOut={this.signOut} meth={this.handleEvent}/>
+             </Grid>
+            </Grid>
           </Toolbar>
         </AppBar>
         <Hidden mdUp>
@@ -202,7 +245,7 @@ class ResponsiveDrawer extends React.Component {
         </Hidden>
         <main className={classes.content}>
           <div className={classes.toolbar} />
-          <Typography noWrap>{'You think water moves fast? You should see ice.'}</Typography>
+          
         </main>
       </div>
     );

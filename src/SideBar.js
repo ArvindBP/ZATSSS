@@ -2,14 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import Drawer from 'material-ui/Drawer';
-import Button from 'material-ui/Button';
 import List from 'material-ui/List';
 import Divider from 'material-ui/Divider';
-import {SideBar } from './tileData';
+import SideBar  from './tileData';
 
 const styles = {
   list: {
-    width: 300,
+    width: 350,
   },
   fullList: {
     width: 'auto',
@@ -34,24 +33,24 @@ class TemporaryDrawer extends React.Component {
       <div className={classes.list}>
         <List>About #General</List>
         <Divider />
-        <List>{SideBar}</List>
+        <List><SideBar text={this.props.users}/></List>
         <Divider />
       </div>
     );
 
     return (
       <div>
-        <Button>
+        <div>
           <i class="material-icons"
             onClick={this.toggleDrawer('right', true)}
             color="inherit"
           >info_outline</i>
-        </Button>
+        </div>
         <Drawer anchor="right" open={this.state.right} onClose={this.toggleDrawer('right', false)}>
           <div
             tabIndex={0}
             role="button"
-            onClick={this.toggleDrawer('right', false)}
+            // onClick={this.toggleDrawer('right', false)}
             onKeyDown={this.toggleDrawer('right', false)}
           >
             {sideList}
