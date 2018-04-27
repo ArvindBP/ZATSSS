@@ -16,8 +16,13 @@ import TemporaryDrawer from './SideBar';
 import Settings from './Settings';
 import Grid from 'material-ui/Grid';
 import * as firebase from 'firebase';
+import List from 'material-ui/List';
 import history from './history';
 import FullScreenDialog from './fullscreendialog';
+import CreateChannel from './CreateChannel';
+import Icon from 'material-ui/Icon';
+import green from 'material-ui/colors/green';
+
 const drawerWidth = 240;
 
 const styles = theme => ({
@@ -30,6 +35,13 @@ const styles = theme => ({
     display: 'flex',
     width: '100%',
   },
+  iconHover: {
+    margin: theme.spacing.unit * 2,
+    '&:hover': {
+      color: green[200],
+    },
+  },
+
   appBar: {
     position: 'absolute',
     marginLeft: drawerWidth,
@@ -81,8 +93,26 @@ class ResponsiveDrawer extends React.Component {
    users:[],
    searchTerm:'',
    nextId:0,
+   openCreateChannel:false,
+    list:[]
+
   };
 }
+
+  handleClick = () => {
+    this.setState({openCreateChannel:true})
+  } 
+  createChannels = (newChannel) => {
+    console.log(newChannel);
+    let x = this.state.list;
+    x.push(newChannel);
+    this.setState({list:x});
+    console.log(newChannel+ "list data");
+    console.log(this.state.list);
+    this.setState({openCreateChannel:false})
+  }
+
+
 
   componentDidMount(){
     //var userId = firebase.auth().currentUser.uid;
@@ -167,22 +197,41 @@ class ResponsiveDrawer extends React.Component {
         </ListItem>
    )
     })
-    console.log(hello);
+    //console.log(hello);
     const { alignItems, direction, justify } = this.state;
     const { classes, theme } = this.props;
     const drawer = (
-      <div className={classes.toolbar} >
-        
-        <ListItem button>
-          <ListItemText primary="Channel" />
-        </ListItem>
+      <div>
+        <List>
+        <Grid container>
+          <Grid xs={12}>
+            <ListItem>
+              <ListItemText primary="Sapient-XT" />
+            </ListItem>
+          </Grid>   
+        </Grid>
         <Divider />
-        <ListItem button >
-          <FullScreenDialog />
+        </List>
+        <div className={classes.toolbar} />
+        <ListItem>
+          <h3>Channels</h3>
+          <Icon button className={classes.iconHover} onClick={this.handleClick}>
+           add_circle
+          </Icon>
         </ListItem>
-                
+        {
+            this.state.list.map(item => (
+              <List>
+                <ListItem key={item.id} dense button className={classes.listItem} style={{ background: 'beige', marginBottom: '6px' }}>
+                    <ListItemText primary={item.val}
+                      style={{float:"left", color: '#ffffff', fontSize: '18px', marginLeft: '10px' }} />
+                      
+                </ListItem>
+              </List>
+            ))
+          } 
       </div>
-   );
+    );
 
     return (
       <div className={classes.root}>
@@ -245,7 +294,7 @@ class ResponsiveDrawer extends React.Component {
         </Hidden>
         <main className={classes.content}>
           <div className={classes.toolbar} />
-          
+          {this.state.openCreateChannel && <CreateChannel channels={this.createChannels} />}
         </main>
       </div>
     );
