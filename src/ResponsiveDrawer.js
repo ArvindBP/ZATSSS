@@ -22,13 +22,8 @@ import FullScreenDialog from './fullscreendialog';
 import CreateChannel from './CreateChannel';
 import Icon from 'material-ui/Icon';
 import green from 'material-ui/colors/green';
-import {
-  HashRouter as Router,
-  Route,
-  Link,
-  Switch,
-  Redirect
-} from 'react-router-dom'
+import Input, { InputLabel, InputAdornment } from 'material-ui/Input';
+
 
 const drawerWidth = 240;
 
@@ -48,6 +43,15 @@ const styles = theme => ({
       color: green[200],
     },
   },
+
+  adornmentamount: {
+   width:'80%',
+   marginTop:'53%',
+   paddingleft:'10px;',
+   
+   position:'relative',
+   
+},
 
   appBar: {
     position: 'absolute',
@@ -98,6 +102,7 @@ class ResponsiveDrawer extends React.Component {
    justify: 'space-between',
    alignItems: 'flex-start',
    users:[],
+   channels: [],
    searchTerm:'',
    nextId:0,
    openCreateChannel:false,
@@ -110,21 +115,69 @@ class ResponsiveDrawer extends React.Component {
     this.setState({openCreateChannel:true})
   } 
   createChannels = (newChannel) => {
-    console.log(newChannel);
-    let x = this.state.list;
-    x.push(newChannel);
-    this.setState({list:x});
-    console.log(newChannel+ "list data");
-    console.log(this.state.list);
+    // console.log(newChannel);
+    // let x = this.state.list;
+    // x.push(newChannel);
+    // this.setState({list:x});
+    // console.log(newChannel+ "list data");
+    // console.log(this.state.list);
     this.setState({openCreateChannel:false})
+
+    let UID='';
+        let ChannelID = '';
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                console.log("userName: ", user.displayName);
+                console.log("user email: ", user.email);
+                console.log("user id: ",user.uid);
+                UID = user.uid;
+                let d = new Date();
+                let n = d.getTime();
+                ChannelID = `${UID}${n}`;
+                console.log(ChannelID);
+
+            } else {
+                // No user is signed in.
+                console.log("no user is signed in");
+            }
+
+            console.log('ddddasd '+UID);
+        
+        let sampleMembers = [
+        ];
+
+        let d = new Date();
+        let n = d.getTime();
+        let sampleMessages = [
+        ]
+
+        firebase.database().ref('channels/'+ChannelID.toString()).set({
+            channelname: newChannel.val,
+            description: '',
+            members: sampleMembers,
+            messages: sampleMessages
+        });
+        //console.log("from write user: ", name + " " + emailId + " " + id);
+
+        });
   }
 
 
 
   componentDidMount(){
-    
+    //var userId = firebase.auth().currentUser.uid;
+  // const  firebase.database().ref('/users/').once('value').then(function(snapshot) {
+  // var username = snapshot.val() || 'Anonymous';
+  // let obj;
+  // let user = [];
+
+  // for (obj in username){
+  //   user.push(username[obj].username);
+  // }
+  // this.state.users = user;
+  // this.setState({users: user});
   let user = [];        
-  const UserList = firebase.database().ref('users/').once('value').then(function(snapshot) {
+  const UserList = firebase.database().ref('users/').once('value').then((snapshot) => {
            console.log("Users: ", snapshot.val());
            let userArr = snapshot.val();
            let obj;
@@ -133,11 +186,23 @@ class ResponsiveDrawer extends React.Component {
              console.log(userArr[obj].username);
              user.push(userArr[obj].username);
            }
+           this.setState({users: user});
+           console.log("console from component mount: ",this.state.users);
        });
 
-//this.setState({users: user});
-//console.log("console from component mount: ",this.state.users);
-
+  let channel = [];        
+  const channelList = firebase.database().ref('channels/').once('value').then((snapshot) => {
+           console.log("Channels: ", snapshot.val());
+           let channelArr = snapshot.val();
+           let obj;
+           console.log(channelArr);
+           for(obj in channelArr){
+             console.log(channelArr[obj].channelname);
+             channel.push(channelArr[obj].channelname);
+           }
+           this.setState({channels: channel});
+           console.log("console from component mount: ",channel);
+       });
   
 
   }
@@ -187,6 +252,7 @@ class ResponsiveDrawer extends React.Component {
    }
   render() {
 
+    
     let hello = this.state.users.map((user) =>{
       return (
         <ListItem button>
@@ -194,6 +260,16 @@ class ResponsiveDrawer extends React.Component {
         </ListItem>
    )
     })
+
+    let Channel = this.state.channels.map( (item) => {
+          return (
+                <ListItem button>
+                    <ListItemText primary={item}
+                      style={{float:"left", color: '#ffffff', fontSize: '18px', marginLeft: '10px' }} />
+                      
+                </ListItem> )
+            })
+
     //console.log(hello);
     const { alignItems, direction, justify } = this.state;
     const { classes, theme } = this.props;
@@ -209,38 +285,19 @@ class ResponsiveDrawer extends React.Component {
         </Grid>
         <Divider />
         </List>
-        
+        <div className={classes.toolbar} />
         <ListItem button>
+         <FullScreenDialog />
+       </ListItem>
+        <ListItem>
           <h3>Channels</h3>
           <Icon button className={classes.iconHover} onClick={this.handleClick}>
            add_circle
           </Icon>
         </ListItem>
-        {
-            this.state.list.map(item => (
-                <ListItem key={item.id} dense button className={classes.listItem} style={{ background: 'beige', marginBottom: '6px' }}>
-                    <ListItemText primary={item.val}
-                      style={{float:"left", color: '#ffffff', fontSize: '18px', marginLeft: '10px' }} />
-                      
-                </ListItem>
-            ))
-          }
-        <ListItem button>
-          <h3>Direct Messages</h3>
-          <Icon button className={classes.iconHover} onClick={this.handleClick}>
-           add_circle
-          </Icon>
-        </ListItem>
-        {
-            this.state.list.map(item => (
-                <ListItem key={item.id} dense button className={classes.listItem} style={{ background: 'beige', marginBottom: '6px' }}>
-                    <ListItemText primary={item.val}
-                      style={{float:"left", color: '#ffffff', fontSize: '18px', marginLeft: '10px' }} />
-                      
-                </ListItem>
-            ))
-          }
-
+          { Channel }
+          <h3 >&nbsp;&nbsp;Users </h3>
+          {hello} 
       </div>
     );
 
@@ -305,6 +362,16 @@ class ResponsiveDrawer extends React.Component {
         </Hidden>
         <main className={classes.content}>
           <div className={classes.toolbar} />
+          <InputLabel htmlFor="adornment-amount"></InputLabel>
+
+         <Input
+           className = {classes.adornmentamount}
+           placeholder="enter the message"
+           startAdornment={<InputAdornment position="start"></InputAdornment>
+}
+
+         />
+             <i class="material-icons">send</i>
           {this.state.openCreateChannel && <CreateChannel channels={this.createChannels} />}
         </main>
       </div>
