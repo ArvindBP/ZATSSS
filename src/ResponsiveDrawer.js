@@ -101,6 +101,7 @@ class ResponsiveDrawer extends React.Component {
     direction: 'row',
    justify: 'space-between',
    alignItems: 'flex-start',
+   members:[],
    users:[],
    channels: [],
    searchTerm:'',
@@ -165,17 +166,8 @@ class ResponsiveDrawer extends React.Component {
 
 
   componentDidMount(){
-    //var userId = firebase.auth().currentUser.uid;
-  // const  firebase.database().ref('/users/').once('value').then(function(snapshot) {
-  // var username = snapshot.val() || 'Anonymous';
-  // let obj;
-  // let user = [];
+    
 
-  // for (obj in username){
-  //   user.push(username[obj].username);
-  // }
-  // this.state.users = user;
-  // this.setState({users: user});
   let user = [];        
   const UserList = firebase.database().ref('users/').once('value').then((snapshot) => {
            console.log("Users: ", snapshot.val());
@@ -184,7 +176,10 @@ class ResponsiveDrawer extends React.Component {
            console.log(userArr);
            for(obj in userArr){
              console.log(userArr[obj].username);
-             user.push(userArr[obj].username);
+             let obj1 = {};
+             obj1.id = obj;
+             obj1.name = userArr[obj].username  
+             user.push(obj1);
            }
            this.setState({users: user});
            console.log("console from component mount: ",this.state.users);
@@ -203,8 +198,6 @@ class ResponsiveDrawer extends React.Component {
            this.setState({channels: channel});
            console.log("console from component mount: ",channel);
        });
-  
-
   }
 
 
@@ -237,10 +230,10 @@ class ResponsiveDrawer extends React.Component {
     this.setState({ open: false });
   };
   addUsers = () => {
-     let adding = this.state.users.slice();
+     let adding = this.state.members.slice();
      adding.push({id:this.state.nextId , person:this.state.searchTerm});
      this.setState({
-       users : adding,
+       members : adding,
        nextId : ++this.state.nextId
      });
    };
@@ -250,13 +243,17 @@ class ResponsiveDrawer extends React.Component {
      console.log("inside  "+this.state.searchTerm);
      this.addUsers();
    }
+
+   hello = (id) => {
+    console.log(id)
+   }
   render() {
 
     
     let hello = this.state.users.map((user) =>{
       return (
         <ListItem button>
-          <ListItemText primary={user} />
+          <ListItemText onClick={()=>this.hello(user.id)} primary={user.name} />
         </ListItem>
    )
     })
@@ -325,7 +322,7 @@ class ResponsiveDrawer extends React.Component {
                </Typography>
              </Grid>
              <Grid xs={1}>
-               <TemporaryDrawer users={this.state.users}/>
+               <TemporaryDrawer members={this.state.members}/>
              </Grid>
              <Grid xs={1}>
                 <Settings signOut={this.signOut} meth={this.handleEvent}/>

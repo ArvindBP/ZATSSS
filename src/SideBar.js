@@ -33,7 +33,7 @@ class TemporaryDrawer extends React.Component {
       <div className={classes.list}>
         <List>About #General</List>
         <Divider />
-        <List><SideBar text={this.props.users}/></List>
+        <List><SideBar text={this.props.members}/></List>
         <Divider />
       </div>
     );
